@@ -15,7 +15,7 @@ VirtualSpace AppSec combines static code analysis with specialized machine learn
 ## Features
 
 - **AI-Powered Detection**: Specialized machine learning trained explicitly for security vulnerability identification.
-- - **Supreme Accuracy**: Outperforms generic AI models by detecting complex vulnerabilities missed by others.
+- **Supreme Accuracy**: Outperforms generic AI models by detecting complex vulnerabilities missed by others.
 - **Advanced Static Analysis**: Comprehensive binary and source-level examination.
 
 ## Proof of AI Advantage
