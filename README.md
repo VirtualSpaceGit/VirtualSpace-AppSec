@@ -29,7 +29,7 @@ Included in this repository is a Python example demonstrating a critical vulnera
 
 ## Usage
 
-Feel free to replicate and verify this demonstration to see the superior detection capabilities of VirtualSpace AppSec if you have a license key to VirtualSpace AppSec, or purchase one with 10% OFF `GHOFF10` :)
+Feel free to replicate and verify this demonstration to see the supreme detection capabilities of VirtualSpace AppSec if you have a license key to VirtualSpace AppSec, or purchase one with 10% OFF `GHOFF10` :)
 
 ## 📜 Disclaimer
 
