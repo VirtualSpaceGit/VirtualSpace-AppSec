@@ -27,7 +27,7 @@ Included in this repository is a Python example demonstrating a critical vulnera
 
 ## Usage 🧪
 
-![Vulnerability Detected](https://raw.githubusercontent.com/VirtualSpaceGit/VirtualSpace-AppSec/main/assets/vuln-caught.png)
+![Vulnerability Detected](vuln-caught.png)
 
 
 Review the provided Python PoC file and the linked ChatGPT conversation for comparison. The screenshot (`Vuln caught.png`) shows VirtualSpace AppSec accurately identifying the vulnerability GPT-4 missed.
