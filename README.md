@@ -20,15 +20,14 @@ VirtualSpace AppSec combines static code analysis with specialized machine learn
 
 ## Proof of AI Advantage
 
+![Vuln caught](Vuln-caught.png)
+
 Included in this repository is a Python example demonstrating a critical vulnerability that GPT-4 ([ChatGPT test](https://chatgpt.com/c/688decd4-02e0-832c-812d-1bcb8c7df120)) failed to identify, while VirtualSpace AppSec successfully detected it, as shown in the screenshot (`Vuln caught.png`).
 
 - 📌 **Python PoC**: Illustrates a specific security flaw undetected by GPT-4.
 - 📸 **Screenshot Proof**: (`Vuln caught.png`) Demonstrates detection by VirtualSpace AppSec's specialized AI.
 
 ## Usage 🧪
-
-![Vuln caught](Vuln-caught.png)
-
 
 Review the provided Python PoC file and the linked ChatGPT conversation for comparison. The screenshot (`Vuln caught.png`) shows VirtualSpace AppSec accurately identifying the vulnerability GPT-4 missed.
 
