@@ -4,7 +4,7 @@
 
 ## Proof of Concept (PoC) – AI-Powered Static Application Security Testing
 
-Welcome to the Proof of Concept (PoC) for **VirtualSpace AppSec**, an advanced AI-powered Static Application Security Testing (SAST) solution designed to detect vulnerabilities in your applications that traditional tools or standard AI models might miss. 🧠🔍
+Welcome to the Proof of Concept (PoC) for **VirtualSpace AppSec**, an advanced AI-powered Static Application Security Testing (SAST) solution designed to detect vulnerabilities in your applications that traditional tools or standard AI models might miss. Read down below for further Proof Of Concept! 🧠🔍
 
 ---
 
