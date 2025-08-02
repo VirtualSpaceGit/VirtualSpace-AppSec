@@ -37,6 +37,6 @@ Feel free to replicate and verify this demonstration to clearly see the superior
 
 This PoC is for demonstration and educational purposes only, designed to highlight the unique capability of VirtualSpace AppSec in identifying vulnerabilities missed by generic AI models. For real-world deployments, VirtualSpace AppSec provides comprehensive scanning and reporting features with enterprise-grade accuracy.
 
-## 📜 License
+## ⚠️ License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
