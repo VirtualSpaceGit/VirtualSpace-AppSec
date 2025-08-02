@@ -31,10 +31,10 @@ Included in this repository is a Python example demonstrating a critical vulnera
 
 Feel free to replicate and verify this demonstration to see the supreme detection capabilities of VirtualSpace AppSec if you have a license key to VirtualSpace AppSec, or purchase one with 10% OFF `GHOFF10` :)
 
-## 📜 Disclaimer
+## ⚠️ Disclaimer
 
 This PoC is for demonstration and educational purposes only, designed to highlight the unique capability of VirtualSpace AppSec in identifying vulnerabilities missed by generic AI models. For real-world deployments, VirtualSpace AppSec provides comprehensive scanning and reporting features with enterprise-grade accuracy.
 
-## ⚠️ License
+## 📜 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
