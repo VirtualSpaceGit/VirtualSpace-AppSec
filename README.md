@@ -27,15 +27,16 @@ Included in this repository is a Python example demonstrating a critical vulnera
 - 📌 **Python PoC**: Illustrates a specific security flaw undetected by GPT-4.
 - 📸 **Screenshot Proof**: (`Vuln caught.png`) Demonstrates detection by VirtualSpace AppSec's specialized AI.
 
-## Usage 🧪
+## Usage
 
 Review the provided Python PoC file and the linked ChatGPT conversation for comparison. The screenshot (`Vuln caught.png`) shows VirtualSpace AppSec accurately identifying the vulnerability GPT-4 missed.
 
 Feel free to replicate and verify this demonstration to clearly see the superior detection capabilities of VirtualSpace AppSec.
 
-⚠️ **Disclaimer**:  
+## 📜 Disclaimer
+
 This PoC is for demonstration and educational purposes only, designed to highlight the unique capability of VirtualSpace AppSec in identifying vulnerabilities missed by generic AI models. For real-world deployments, VirtualSpace AppSec provides comprehensive scanning and reporting features with enterprise-grade accuracy.
 
-## License
+## 📜 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
