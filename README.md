@@ -20,8 +20,8 @@ VirtualSpace AppSec combines static code analysis with specialized machine learn
 
 Included in this repository is a Python example demonstrating a critical vulnerability that GPT-4 ([GPT Test](https://chatgpt.com/c/688decd4-02e0-832c-812d-1bcb8c7df120)) failed to identify; instead, it pointed out code quality improvements, unrelated to vulnerabilities, while VirtualSpace AppSec successfully filtered and detected it, as shown in the screenshot above.
 
-- 📌 **Python Proof Of Concept**: Illustrates a specific security flaw undetected by GPT-4.
-- 📸 **Screenshot Proof**: Demonstrates detection by VirtualSpace AppSec's specialized AI.
+- **Python Proof Of Concept**: Illustrates a specific security flaw undetected by GPT-4.
+- **Screenshot Proof**: Demonstrates detection by VirtualSpace AppSec's specialized AI.
 
 ## 🧪 Usage
 
