@@ -2,23 +2,19 @@
 
 [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Proof of Concept (PoC) – AI-Powered Static Application Security Testing
-
-Welcome to the Proof of Concept (PoC) for **VirtualSpace AppSec**, an advanced AI-powered Static Application Security Testing (SAST) solution designed to detect vulnerabilities in your applications that traditional tools or standard AI models might miss! 🧠🔍
-
 ---
 
-## Overview
+## 📌 Overview
 
 VirtualSpace AppSec combines static code analysis with specialized machine learning trained on thousands of real-world vulnerability patterns. This PoC illustrates how our tailored AI outperforms generic models (like GPT-4) in identifying critical vulnerabilities in C, C++, and .NET applications, ensuring your code remains secure against emerging threats in the real world.
 
-## Features
+## 💎 Features
 
 - **AI-Powered Detection**: Specialized machine learning trained explicitly for security vulnerability identification.
 - **Supreme Accuracy**: Outperforms generic AI models by detecting complex vulnerabilities missed by others.
 - **Advanced Static Analysis**: Comprehensive static binary and source-level examination.
 
-## Proof of AI Advantage
+## 🔍 Proof of AI Advantage
 
 ![Vuln caught](Vuln-caught.png)
 
@@ -27,7 +23,7 @@ Included in this repository is a Python example demonstrating a critical vulnera
 - 📌 **Python Proof Of Concept**: Illustrates a specific security flaw undetected by GPT-4.
 - 📸 **Screenshot Proof**: Demonstrates detection by VirtualSpace AppSec's specialized AI.
 
-## Usage
+## 🧪 Usage
 
 Feel free to replicate and verify this demonstration to see the supreme detection capabilities of VirtualSpace AppSec if you have a license key to VirtualSpace AppSec, or purchase one with 10% OFF `GHOFF10` :)
 
