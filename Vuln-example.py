@@ -2,6 +2,7 @@ import os
 import json
 import zlib
 import struct
+import hashlib
 from typing import Dict, Any, Optional
 
 class DataSerializer:
@@ -26,6 +27,8 @@ class DataSerializer:
         else:
             is_compressed = 0
             
+        checksum = hashlib.sha256(json_bytes).digest()[:4]
+
         header = struct.pack('<4sHBBI', 
             self.MAGIC,
             self.VERSION,
@@ -34,10 +37,10 @@ class DataSerializer:
             len(json_bytes)
         )
         
-        return header + json_bytes
+        return header + checksum + json_bytes
     
     def deserialize(self, data: bytes) -> Optional[Dict[str, Any]]:
-        if len(data) < 13:
+        if len(data) < 17:
             return None
             
         magic, version, is_compressed, reserved, size = struct.unpack('<4sHBBI', data[:13])
@@ -47,9 +50,13 @@ class DataSerializer:
             
         if size > self.max_size:
             return None
-            
-        payload = data[13:13+size]
+
+        stored_checksum = data[13:17]
+        payload = data[17:17+size]
         if len(payload) != size:
+            return None
+
+        if hashlib.sha256(payload).digest()[:4] != stored_checksum:
             return None
             
         try:
