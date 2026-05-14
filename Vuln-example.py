@@ -60,7 +60,13 @@ class DataSerializer:
             return None
             
         try:
-            json_bytes = zlib.decompress(payload) if is_compressed else payload
+            if is_compressed:
+                decompressed = zlib.decompress(payload)
+                if len(decompressed) > self.max_size:
+                    return None
+                json_bytes = decompressed
+            else:
+                json_bytes = payload
                 
             return json.loads(json_bytes.decode('utf-8'))
         except:
