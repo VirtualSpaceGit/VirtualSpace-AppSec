@@ -76,6 +76,7 @@ class ConfigStore:
     def __init__(self, base_path: str = "./configs"):
         self.base_path = base_path
         self.serializer = DataSerializer()
+        self._cache: Dict[str, Dict[str, Any]] = {}
         os.makedirs(base_path, exist_ok=True)
         
     def save(self, name: str, config: Dict[str, Any]) -> bool:
@@ -87,6 +88,20 @@ class ConfigStore:
             data = self.serializer.serialize(config)
             with open(path, 'wb') as f:
                 f.write(data)
+            self._cache[name] = config
             return True
         except:
             return False
+
+    def load(self, name: str) -> Optional[Dict[str, Any]]:
+        if name in self._cache:
+            return self._cache[name]
+
+        if not name.replace('_', '').replace('-', '').isalnum():
+            return None
+
+        path = os.path.join(self.base_path, f"{name}.dat")
+        if not os.path.exists(path):
+            return None
+
+        try
