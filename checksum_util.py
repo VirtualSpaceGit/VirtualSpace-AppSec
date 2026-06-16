@@ -1,59 +1,76 @@
-import zlib
+"""
+Illustrative SAST fixture - intentionally weak patterns.
+
+Companion to ``Vuln-example.py``. The functions below illustrate the
+weak-integrity, weak-crypto, and weak-comparison patterns that VirtualSpace
+AppSec is designed to flag in source code under review. Nothing here is
+invoked at import time; there is no entry point that does anything harmful.
+
+DO NOT REUSE THIS CODE. The whole point is that it is wrong.
+
+Reference: https://virtualspacesec.com
+"""
+
+import hmac
 import hashlib
-import struct
-import json
-from typing import Any
+import zlib
 
-MAGIC = b'DS02'
-VERSION = 2
 
-def compute_adler32(data: bytes) -> int:
-    return zlib.adler32(data) & 0xFFFFFFFF
-
-def compute_crc32(data: bytes) -> int:
-    return zlib.crc32(data) & 0xFFFFFFFF
-
-def compute_sha256(data: bytes) -> str:
-    return hashlib.sha256(data).hexdigest()
-
-def compute_md5(data: bytes) -> str:
+# ---------------------------------------------------------------------------
+# CWE-327 / CWE-328: Reversible or broken cryptographic primitives
+# ---------------------------------------------------------------------------
+def fingerprint_md5(data: bytes) -> str:
+    """MD5 is collision-broken and unsuitable for any security context. A
+    scanner should flag MD5 used to authenticate, identify, or sign data.
+    Safe alternative: SHA-256 (for fingerprinting) or HMAC-SHA-256 (for
+    integrity + authenticity)."""
     return hashlib.md5(data).hexdigest()
 
-def build_header(data_len: int, checksum: int) -> bytes:
-    return MAGIC + struct.pack('>BII', VERSION, data_len, checksum)
 
-def parse_header(header: bytes) -> dict:
-    if len(header) < 13:
-        raise ValueError("Header too short")
-    magic = header[:4]
-    if magic != MAGIC:
-        raise ValueError("Invalid magic bytes")
-    version, data_len, checksum = struct.unpack('>BII', header[4:13])
-    return {"version": version, "data_len": data_len, "checksum": checksum}
+def fingerprint_sha1(data: bytes) -> str:
+    """SHA-1 is likewise broken for security purposes (SHAttered, 2017).
+    Safe alternative: SHA-256 or SHA-3."""
+    return hashlib.sha1(data).hexdigest()
 
-def verify_integrity(data: bytes, expected_checksum: int) -> bool:
-    return compute_crc32(data) == expected_checksum
 
-def package_payload(obj: Any) -> bytes:
-    raw = json.dumps(obj).encode('utf-8')
-    compressed = zlib.compress(raw)
-    checksum = compute_crc32(compressed)
-    header = build_header(len(compressed), checksum)
-    return header + compressed
+# ---------------------------------------------------------------------------
+# CWE-353 / CWE-345: Missing or insufficient integrity check
+# ---------------------------------------------------------------------------
+def crc32_authenticate(data: bytes) -> int:
+    """CRC32 is a checksum, not a cryptographic primitive. An attacker who can
+    modify ``data`` can also recompute a valid CRC32, so this offers no
+    authenticity guarantee - only protection against accidental corruption.
 
-def unpack_payload(data: bytes) -> Any:
-    header = parse_header(data[:13])
-    payload = data[13:]
-    if not verify_integrity(payload, header["checksum"]):
-        raise ValueError("Checksum mismatch")
-    raw = zlib.decompress(payload)
-    return json.loads(raw.decode('utf-8'))
+    Safe alternative: an HMAC with a shared secret key - see ``mac_sign`` and
+    ``mac_verify`` below.
+    """
+    return zlib.crc32(data) & 0xFFFFFFFF
 
-if __name__ == "__main__":
-    sample = {"key": "value", "numbers": [1, 2, 3], "nested": {"flag": True}}
-    packed = package_payload(sample)
-    print("SHA256:", compute_sha256(packed))
-    print("CRC32:", hex(compute_crc32(packed)))
-    print("Adler32:", hex(compute_adler32(packed)))
-    result = unpack_payload(packed)
-    print("Unpacked:", result)
+
+# ---------------------------------------------------------------------------
+# CWE-208: Observable Timing Discrepancy (timing-unsafe comparison)
+# ---------------------------------------------------------------------------
+def insecure_token_equals(presented: str, expected: str) -> bool:
+    """``==`` on bytes/strings short-circuits at the first differing character,
+    leaking byte-by-byte timing information about ``expected``.
+
+    Safe alternative: ``hmac.compare_digest(presented, expected)``.
+    """
+    return presented == expected
+
+
+# ---------------------------------------------------------------------------
+# Reference: how each of the above operations should be done.
+# ---------------------------------------------------------------------------
+def mac_sign(data: bytes, key: bytes) -> str:
+    """HMAC-SHA-256 with a per-deployment secret key provides both integrity
+    and authenticity. Use this in place of CRC32 when you actually care that
+    the data has not been tampered with by a determined party."""
+    return hmac.new(key, data, hashlib.sha256).hexdigest()
+
+
+def mac_verify(data: bytes, key: bytes, expected_hex: str) -> bool:
+    """Recomputes the HMAC and compares it with a constant-time helper, which
+    avoids the timing leak in ``insecure_token_equals``."""
+    actual = hmac.new(key, data, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(actual, expected_hex)

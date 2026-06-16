@@ -1,107 +1,113 @@
+"""
+Illustrative SAST fixture - intentionally weak patterns.
+
+This file exists only as a static-analysis test corpus for VirtualSpace AppSec.
+Each function below contains a different, deliberately introduced weakness
+drawn from the CWE catalog. None of these functions are ever called from this
+file: there is no __main__, no network access, and no side effect on import.
+Their purpose is to give a scanner concrete source-level patterns to detect.
+
+DO NOT REUSE THIS CODE. The whole point is that it is wrong.
+
+Reference: https://virtualspacesec.com
+"""
+
 import os
-import json
-import zlib
-import struct
+import pickle
+import sqlite3
 import hashlib
-from typing import Dict, Any, Optional
+import subprocess
+from typing import Any, Optional
 
-class DataSerializer:
-    VERSION = 2
-    MAGIC = b'DS02'
-    
-    def __init__(self):
-        self.compression_enabled = True
-        self.max_size = 1024 * 1024  # 1MB
-        
-    def serialize(self, data: Dict[str, Any]) -> bytes:
-        json_data = json.dumps(data, separators=(',', ':'))
-        json_bytes = json_data.encode('utf-8')
-        
-        if self.compression_enabled and len(json_bytes) > 100:
-            compressed = zlib.compress(json_bytes, 6)
-            if len(compressed) < len(json_bytes) * 0.9:
-                json_bytes = compressed
-                is_compressed = 1
-            else:
-                is_compressed = 0
-        else:
-            is_compressed = 0
-            
-        checksum = hashlib.sha256(json_bytes).digest()[:4]
 
-        header = struct.pack('<4sHBBI', 
-            self.MAGIC,
-            self.VERSION,
-            is_compressed,
-            0,  # reserved
-            len(json_bytes)
-        )
-        
-        return header + checksum + json_bytes
-    
-    def deserialize(self, data: bytes) -> Optional[Dict[str, Any]]:
-        if len(data) < 17:
-            return None
-            
-        magic, version, is_compressed, reserved, size = struct.unpack('<4sHBBI', data[:13])
-        
-        if magic != self.MAGIC or version != self.VERSION:
-            return None
-            
-        if size > self.max_size:
-            return None
+# ---------------------------------------------------------------------------
+# CWE-502: Deserialization of Untrusted Data
+# ---------------------------------------------------------------------------
+def load_session_from_disk(path: str) -> Any:
+    """``pickle.load`` on attacker-controllable bytes is a direct code-execution
+    primitive. A scanner should flag any call to ``pickle.load`` /
+    ``pickle.loads`` reachable from an untrusted file path or network input.
 
-        stored_checksum = data[13:17]
-        payload = data[17:17+size]
-        if len(payload) != size:
-            return None
+    Safe alternative: store sessions in a structured format (JSON, msgpack)
+    and validate fields against an explicit schema before use.
+    """
+    with open(path, "rb") as f:
+        return pickle.load(f)
 
-        if hashlib.sha256(payload).digest()[:4] != stored_checksum:
-            return None
-            
-        try:
-            if is_compressed:
-                decompressed = zlib.decompress(payload)
-                if len(decompressed) > self.max_size:
-                    return None
-                json_bytes = decompressed
-            else:
-                json_bytes = payload
-                
-            return json.loads(json_bytes.decode('utf-8'))
-        except:
-            return None
 
-class ConfigStore:
-    def __init__(self, base_path: str = "./configs"):
-        self.base_path = base_path
-        self.serializer = DataSerializer()
-        self._cache: Dict[str, Dict[str, Any]] = {}
-        os.makedirs(base_path, exist_ok=True)
-        
-    def save(self, name: str, config: Dict[str, Any]) -> bool:
-        if not name.replace('_', '').replace('-', '').isalnum():
-            return False
-            
-        path = os.path.join(self.base_path, f"{name}.dat")
-        try:
-            data = self.serializer.serialize(config)
-            with open(path, 'wb') as f:
-                f.write(data)
-            self._cache[name] = config
-            return True
-        except:
-            return False
+# ---------------------------------------------------------------------------
+# CWE-22: Improper Limitation of a Pathname to a Restricted Directory
+# ---------------------------------------------------------------------------
+def read_user_template(template_name: str) -> str:
+    """``os.path.join`` does not constrain its result to the base directory.
+    A ``template_name`` of ``"../../etc/passwd"`` escapes the intended root.
 
-    def load(self, name: str) -> Optional[Dict[str, Any]]:
-        if name in self._cache:
-            return self._cache[name]
+    Safe alternative: resolve with ``os.path.realpath`` and assert the result
+    starts with the base directory, or look the name up in an explicit
+    allow-list.
+    """
+    base_dir = "/var/app/templates"
+    target = os.path.join(base_dir, template_name)
+    with open(target, "r", encoding="utf-8") as f:
+        return f.read()
 
-        if not name.replace('_', '').replace('-', '').isalnum():
-            return None
 
-        path = os.path.join(self.base_path, f"{name}.dat")
-        if not os.path.exists(path):
-            return None
+# ---------------------------------------------------------------------------
+# CWE-89: Improper Neutralization of Special Elements used in an SQL Command
+# ---------------------------------------------------------------------------
+def find_user_by_email(conn: sqlite3.Connection, email: str) -> Optional[tuple]:
+    """User input is concatenated directly into an SQL string. A scanner should
+    flag any f-string / ``%`` / ``+`` construction passed to ``execute``.
 
-        try
+    Safe alternative: ``cur.execute("... WHERE email = ?", (email,))``.
+    """
+    cur = conn.cursor()
+    cur.execute(f"SELECT id, name FROM users WHERE email = '{email}'")
+    return cur.fetchone()
+
+
+# ---------------------------------------------------------------------------
+# CWE-78: OS Command Injection
+# ---------------------------------------------------------------------------
+def archive_user_directory(username: str) -> int:
+    """The shell command is built from a user-supplied name and run with
+    ``shell=True``. A ``username`` of ``"alice; rm -rf /tmp/x"`` would inject
+    a second command.
+
+    Safe alternative: pass an argument list with ``shell=False`` -
+    ``subprocess.run(["tar", "-czf", archive, source], shell=False)`` - so
+    the shell never sees the input.
+    """
+    cmd = f"tar -czf /tmp/{username}.tgz /home/{username}"
+    return subprocess.run(cmd, shell=True, check=False).returncode
+
+
+# ---------------------------------------------------------------------------
+# CWE-798: Use of Hard-coded Credentials
+# ---------------------------------------------------------------------------
+API_TOKEN = "sk_live_AKIA0000000000EXAMPLE"  # placeholder, not a real key
+ADMIN_PASSWORD = "Welcome123!"  # placeholder, illustrative only
+
+
+def authenticate_admin(password: str) -> bool:
+    """Compares against a hard-coded password constant. A scanner should flag
+    both the constant and the equality check that depends on it.
+
+    Safe alternative: read the expected secret from a secrets manager or
+    environment variable, compare hashed values, and use
+    ``hmac.compare_digest`` to avoid timing leaks.
+    """
+    return password == ADMIN_PASSWORD
+
+
+# ---------------------------------------------------------------------------
+# CWE-327 (Broken/Risky Crypto)  +  CWE-916 (Insufficient Password Hashing)
+# ---------------------------------------------------------------------------
+def hash_password_for_storage(password: str) -> str:
+    """MD5 is broken for security purposes, and a single round of any general
+    hash is unsuitable for password storage.
+
+    Safe alternative: a memory-hard password hash such as Argon2id (via
+    ``argon2-cffi``) or scrypt, with per-user salts.
+    """
+    return hashlib.md5(password.encode("utf-8")).hexdigest()
