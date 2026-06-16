@@ -58,7 +58,7 @@ There is no `__main__`, no network access, and no filesystem side effect on impo
 | Function | CWE | Pattern |
 |---|---|---|
 | `fingerprint_md5`, `fingerprint_sha1` | CWE-327 / CWE-328 | Broken hash used as a security primitive |
-| `crc32_authenticate` | CWE-353 / CWE-345 | CRC32 (a checksum, not a MAC) used for authenticity |
+| `crc32_authenticate` | CWE-345 | CRC32 (a checksum, not a MAC) used for authenticity |
 | `insecure_token_equals` | CWE-208 | Timing-unsafe `==` on a secret token |
 | `mac_sign`, `mac_verify` | (reference) | The HMAC-SHA-256 + `hmac.compare_digest` pattern the above should have used |
 
