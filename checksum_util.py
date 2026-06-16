@@ -34,7 +34,7 @@ def fingerprint_sha1(data: bytes) -> str:
 
 
 # ---------------------------------------------------------------------------
-# CWE-353 / CWE-345: Missing or insufficient integrity check
+# CWE-345: Insufficient Verification of Data Authenticity
 # ---------------------------------------------------------------------------
 def crc32_authenticate(data: bytes) -> int:
     """CRC32 is a checksum, not a cryptographic primitive. An attacker who can
