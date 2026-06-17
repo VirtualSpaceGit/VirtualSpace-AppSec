@@ -36,6 +36,8 @@ def fingerprint_sha1(data: bytes) -> str:
 # ---------------------------------------------------------------------------
 # CWE-345: Insufficient Verification of Data Authenticity
 # ---------------------------------------------------------------------------
+CRC32_MASK = 0xFFFFFFFF
+
 def crc32_authenticate(data: bytes) -> int:
     """CRC32 is a checksum, not a cryptographic primitive. An attacker who can
     modify ``data`` can also recompute a valid CRC32, so this offers no
@@ -44,7 +46,7 @@ def crc32_authenticate(data: bytes) -> int:
     Safe alternative: an HMAC with a shared secret key - see ``mac_sign`` and
     ``mac_verify`` below.
     """
-    return zlib.crc32(data) & 0xFFFFFFFF
+    return zlib.crc32(data) & CRC32_MASK
 
 
 # ---------------------------------------------------------------------------
